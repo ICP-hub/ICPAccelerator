@@ -1,4 +1,5 @@
 use crate::admin::*;
+use crate::default_images::PROJECT_COVER;
 use crate::mentor::MentorProfile;
 
 use crate::user_module::*;
@@ -46,7 +47,7 @@ pub struct Jobs {
 #[derive(Serialize, Deserialize, Clone, Debug, CandidType, PartialEq)]
 pub struct ProjectInfo {
     pub project_name: String,
-    pub project_logo: Vec<u8>,
+    pub project_logo: Vec<u8>,                                //project_logo
     pub preferred_icp_hub: Option<String>,
     pub live_on_icp_mainnet: Option<String>,
     pub money_raised_till_now: Option<bool>,
@@ -57,7 +58,7 @@ pub struct ProjectInfo {
     pub github_link: Option<String>,
     pub reason_to_join_incubator: String,
     pub project_description: String,
-    pub project_cover: Vec<u8>,
+    pub project_cover: Vec<u8>,                                //project_cover
     pub project_team: Option<Vec<TeamMember>>,
     pub token_economics: Option<String>,
     pub technical_docs: Option<String>,
@@ -79,6 +80,9 @@ pub struct ProjectInfo {
 
 #[derive(Serialize, Deserialize, Clone, Debug, CandidType, PartialEq)]
 pub struct ProjectInfoForUser {
+    pub project_name : String,
+    pub project_description: String,
+    pub project_logo : Vec<u8>,
     pub date_of_joining: Option<u64>,
     pub mentor_associated: Option<Vec<MentorProfile>>,
     pub vc_associated: Option<Vec<VentureCapitalist>>,
@@ -272,6 +276,19 @@ pub async fn create_project(info: ProjectInfo) -> String {
     let uuids = raw_rand().await.unwrap().0;
     let uid = format!("{:x}", Sha256::digest(&uuids));
     let new_id = uid.clone().to_string();
+
+    //convert base64 into vec of u8
+
+    let mut info_mut = info.clone();
+
+    // fn convert_to_vec_u8(img_to_convert : &str) -> Vec<u8>{
+    //     base64::decode(img_to_convert).expect("is not getting converted")
+    // }
+
+    // if info_clone.project_cover.is_empty(){
+    //     info_mut.project_cover = convert_to_vec_u8(PROJECT_COVER)
+    // }
+
 
     let new_project = ProjectInfoInternal {
         params: info.clone(),
@@ -780,6 +797,9 @@ pub fn get_project_info_for_user(project_id: String) -> Option<ProjectInfoForUse
             .flat_map(|(_, project_list)| project_list.iter())
             .find(|project_internal| project_internal.uid == project_id)
             .map(|project_internal| ProjectInfoForUser {
+                project_name : project_internal.params.project_name.clone(),
+                project_description : project_internal.params.project_description.clone(),
+                project_logo : project_internal.params.project_logo.clone(),
                 date_of_joining: Some(project_internal.creation_date),
                 mentor_associated: project_internal.params.mentors_assigned.clone(),
                 vc_associated: project_internal.params.vc_assigned.clone(),
@@ -949,8 +969,9 @@ pub fn post_job(
 ) -> String {
     let principal_id = caller();
     let is_owner = APPLICATION_FORM.with(|projects| {
+
         projects.borrow().iter().any(|(owner_principal, projects)| {
-            *owner_principal == principal_id && projects.iter().any(|p| p.uid == project_id)
+            *owner_principal == principal_id && projects.iter().any(|p| p.uid == project_id) 
         })
     });
 

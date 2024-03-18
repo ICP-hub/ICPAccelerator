@@ -173,12 +173,15 @@ type ProjectInfo = record {
 type ProjectInfoForUser = record {
   vc_associated : opt vec VentureCapitalist;
   area_of_focus : opt text;
+  project_description : text;
   reviews : vec Suggestion;
   team_member_info : opt vec TeamMember;
   date_of_joining : opt nat64;
   website_social_group : opt text;
   mentor_associated : opt vec MentorProfile;
   country_of_project : opt text;
+  project_logo : vec nat8;
+  project_name : text;
   announcements : vec record { principal; vec MAnnouncements };
   live_link_of_project : opt text;
   jobs_opportunity : opt vec Jobs;
