@@ -54,11 +54,13 @@ const MentorCard = () => {
   }
 
   useEffect(() => {
+    if(noData === null){
     if (actor) {
       getAllMentors(actor);
     } else {
       getAllMentors(IcpAccelerator_backend);
     }
+  }
   }, [actor]);
   return (
     <div className="p-1 flex items-center mb-8 gap-8">

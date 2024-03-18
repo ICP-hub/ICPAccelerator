@@ -134,12 +134,12 @@ const LaunchedProjects = () => {
     ? { stop1: "#4087BF", stop2: "#3C04BA" }
     : { stop1: "#B5B5B5", stop2: "#5B5B5B" };
 
-  useEffect(() => {
-    if (percent < 100) {
-      tm.current = setTimeout(increase, 30);
-    }
-    return () => clearTimeout(tm.current);
-  }, [percent]);
+  // useEffect(() => {
+  //   if (percent < 100) {
+  //     tm.current = setTimeout(increase, 30);
+  //   }
+  //   return () => clearTimeout(tm.current);
+  // }, [percent]);
 
   const handleClickPlusOne = (id) => {
     setShowLine((prevShowLine) => ({
@@ -224,11 +224,13 @@ const LaunchedProjects = () => {
   };
 
   useEffect(() => {
+    if(noData === null){
     if (actor) {
       getAllProject(actor);
     } else {
       getAllProject(IcpAccelerator_backend);
     }
+  }
   }, [actor]);
 
   const handleNavigate = (projectId) => {

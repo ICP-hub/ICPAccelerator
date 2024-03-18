@@ -99,11 +99,13 @@ function SearchMentors() {
   };
 
   useEffect(() => {
+    if(noData === null){
     if (actor) {
       getAllMentors(actor);
     } else {
       getAllMentors(IcpAccelerator_backend);
     }
+  }
   }, [actor]);
 
   return (

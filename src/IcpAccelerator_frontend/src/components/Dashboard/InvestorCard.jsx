@@ -54,10 +54,12 @@ const InvestorsList = () => {
   }
 
   useEffect(() => {
-    if (actor) {
-      getAllInvestors(actor);
-    } else {
-      getAllInvestors(IcpAccelerator_backend);
+    if (noData === null) {
+      if (actor) {
+        getAllInvestors(actor);
+      } else {
+        getAllInvestors(IcpAccelerator_backend);
+      }
     }
   }, [actor]);
   return (

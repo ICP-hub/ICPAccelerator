@@ -124,12 +124,13 @@ const MoreCurrentlyRaisingProjects = () => {
   };
 
   useEffect(() => {
-    setAllProjectData(defaultArray);
+    if(noData === null){
     if (actor) {
       getAllProject(actor);
     } else {
       getAllProject(IcpAccelerator_backend);
     }
+  }
   }, [actor]);
 
   const handleNavigate = (projectId) => {
