@@ -1,3 +1,4 @@
+use crate::default_images::*;
 use candid::{CandidType, Principal};
 use ic_cdk::api::caller;
 use ic_cdk::api::management_canister::main::raw_rand;
@@ -9,7 +10,6 @@ use sha2::{Digest, Sha256};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Read;
-use crate::default_images::*;
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 pub struct UserInformation {
@@ -116,7 +116,6 @@ pub async fn register_user_role(info: UserInformation) -> std::string::String {
     let uuids = raw_rand().await.unwrap().0;
     let uid = format!("{:x}", Sha256::digest(&uuids));
     let new_id = uid.clone().to_string();
-
 
     fn default_profile_picture() -> Vec<u8> {
         base64::decode(DEFAULT_PROFILE_PICTURE_BASE64).expect("Failed to decode base64 image")
@@ -387,7 +386,9 @@ pub fn get_users_with_all_info() -> UserInfoInternal {
     let caller = caller();
     USER_STORAGE.with(|registry| {
         let user_info_ref = registry.borrow();
-        let user_all_info = user_info_ref.get(&caller).expect("couldn't find user information");
+        let user_all_info = user_info_ref
+            .get(&caller)
+            .expect("couldn't find user information");
         user_all_info.clone()
     })
 }

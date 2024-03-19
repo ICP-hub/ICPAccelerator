@@ -1,14 +1,14 @@
 use crate::mentor::*;
 use crate::project_registration::*;
+
 use crate::user_module::*;
 use crate::vc_registration::*;
 use candid::{CandidType, Principal};
 use ic_cdk::api::management_canister::main::{canister_info, CanisterInfoRequest};
 use ic_cdk::api::stable::{StableReader, StableWriter};
-use ic_cdk::api::time;
 use ic_cdk::api::{caller, id};
+use ic_cdk::api::{canister_balance128, time};
 use ic_cdk_macros::*;
-
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::{
@@ -24,6 +24,7 @@ struct ApprovalRequest {
     country: String,
     tag_used: String,
     requested_for: String,
+    requested_on: u64,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
@@ -51,6 +52,7 @@ pub async fn send_approval_request(
     country: String,
     tag_used: String,
     requested_for: String,
+    requested_on: u64,
 ) -> String {
     //sender
     let caller: Principal = caller();
@@ -75,6 +77,7 @@ pub async fn send_approval_request(
                     country: country.clone(),
                     tag_used: tag_used.clone(),
                     requested_for: requested_for.clone(),
+                    requested_on: requested_on.clone(),
                 };
 
                 let notification_to_send = Notification {
@@ -996,4 +999,70 @@ pub fn post_upgrade_admin() {
     ADMIN_NOTIFICATIONS.with(|notifications_ref| {
         *notifications_ref.borrow_mut() = upvotes;
     });
+}
+
+#[query]
+fn get_pending_cycles() -> u128 {
+    canister_balance128()
+}
+
+#[query]
+fn get_vc_count() -> usize {
+    let vc_awaiters = VENTURECAPITALIST_STORAGE.with(|awaiters| awaiters.borrow().len());
+    vc_awaiters
+}
+
+#[query]
+fn get_mentor_count() -> usize {
+    let mentor_count = MENTOR_REGISTRY.with(|awaiters| awaiters.borrow().len());
+    mentor_count
+}
+
+#[query]
+fn get_project_count() -> usize {
+    let project_count = APPLICATION_FORM.with(|awaiters| awaiters.borrow().len());
+    project_count
+}
+
+#[query]
+fn get_total_user_count() -> usize {
+    let user_count = USER_STORAGE.with(|awaiters| awaiters.borrow().len());
+    user_count
+}
+
+#[query]
+fn get_total_pending_request() -> usize {
+    let pending_requests = MENTOR_AWAITS_RESPONSE.with(|awaiters| awaiters.borrow().len())
+        + VC_AWAITS_RESPONSE.with(|awaiters| awaiters.borrow().len())
+        + PROJECT_AWAITS_RESPONSE.with(|awaiters| awaiters.borrow().len());
+    pending_requests
+}
+
+#[query]
+fn get_only_user() -> usize {
+    ROLE_STATUS_ARRAY.with(|awaiters| {
+        awaiters
+            .borrow()
+            .iter()
+            .filter(|(_, roles)| {
+                let mut has_user_role = false;
+                let mut other_roles_are_default_or_requested = true;
+
+                for role in roles.iter() {
+                    if role.name == "user" {
+                        if role.status != "default" && role.status != "requested" {
+                            has_user_role = true;
+                        }
+                    } else {
+                        if role.status != "default" && role.status != "requested" {
+                            other_roles_are_default_or_requested = false;
+                            break;
+                        }
+                    }
+                }
+
+                has_user_role && other_roles_are_default_or_requested
+            })
+            .count()
+    })
 }

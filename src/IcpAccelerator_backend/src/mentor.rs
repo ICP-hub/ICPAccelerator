@@ -149,6 +149,7 @@ pub async fn register_mentor(profile: MentorProfile) -> String {
                 profile_for_pushing.user_data.country,
                 profile_for_pushing.area_of_expertise,
                 "mentor".to_string(),
+                time(),
             )
             .await;
 
@@ -232,6 +233,7 @@ pub async fn update_mentor(updated_profile: MentorProfile) -> String {
         updated_profile.user_data.country,
         updated_profile.area_of_expertise,
         "mentor".to_string(),
+        time(),
     )
     .await;
 
