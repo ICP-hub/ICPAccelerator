@@ -294,7 +294,7 @@ pub async fn create_project(info: ProjectInfo) -> String {
         info.user_data.country,
         info.project_area_of_focus,
         "project".to_string(),
-        time(),
+        
     )
     .await;
 
@@ -425,7 +425,7 @@ pub async fn update_project(project_id: String, updated_project: ProjectInfo) ->
         updated_project.user_data.country,
         updated_project.project_area_of_focus,
         "project".to_string(),
-        time(),
+        
     )
     .await;
 

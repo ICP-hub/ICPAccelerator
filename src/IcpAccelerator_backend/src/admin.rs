@@ -52,7 +52,6 @@ pub async fn send_approval_request(
     country: String,
     tag_used: String,
     requested_for: String,
-    requested_on: u64,
 ) -> String {
     //sender
     let caller: Principal = caller();
@@ -77,7 +76,7 @@ pub async fn send_approval_request(
                     country: country.clone(),
                     tag_used: tag_used.clone(),
                     requested_for: requested_for.clone(),
-                    requested_on: requested_on.clone(),
+                    requested_on: time(),
                 };
 
                 let notification_to_send = Notification {

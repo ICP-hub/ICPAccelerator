@@ -288,7 +288,7 @@ pub async fn register_venture_capitalist(mut params: VentureCapitalist) -> std::
                 params.user_data.country,
                 params.category_of_investment,
                 "vc".to_string(),
-                time(),
+                
             )
             .await;
 
@@ -421,7 +421,7 @@ pub async fn update_venture_capitalist(params: VentureCapitalist) -> String {
         params.user_data.country,
         params.category_of_investment,
         "vc".to_string(),
-        time(),
+        
     )
     .await;
 
