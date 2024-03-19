@@ -947,7 +947,7 @@ pub fn post_job(
     link: String,
     project_id: String,
 ) -> String {
-    let principal_id = caller();
+    let principal_id = caller();  
     let is_owner = APPLICATION_FORM.with(|projects| {
         projects.borrow().iter().any(|(owner_principal, projects)| {
             *owner_principal == principal_id && projects.iter().any(|p| p.uid == project_id)
