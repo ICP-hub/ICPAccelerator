@@ -126,6 +126,7 @@ type OfferToMentor = record {
   time_of_request : nat64;
   mentor_id : principal;
   mentor_name : text;
+  self_declined_at : nat64;
 };
 type OfferToSendToMentor = record {
   request_status : text;
@@ -137,6 +138,7 @@ type OfferToSendToMentor = record {
   sent_at : nat64;
   project_info : ProjectInfo_1;
   sender_principal : principal;
+  self_declined_at : nat64;
 };
 type ProjectInfo = record {
   sns : opt text;
@@ -362,7 +364,7 @@ type VentureCapitalistInternal = record {
   params : VentureCapitalist;
 };
 service : () -> {
-  accept_offer : (text, text) -> ();
+  accept_offer : (text, text) -> (text);
   add_BlogPost : (text) -> (text);
   add_announcement : (Announcements) -> (text);
   add_job_type : (text) -> (text);
@@ -380,7 +382,7 @@ service : () -> {
   create_cohort : (Cohort) -> (text);
   decline_mentor_creation_request_candid : (principal, bool) -> (text);
   decline_mentor_profile_update_request : (principal, bool) -> (text);
-  decline_offer : (text, text) -> ();
+  decline_offer : (text, text) -> (text);
   decline_project_creation_request : (principal) -> (text);
   decline_vc_creation_request : (principal, bool) -> (text);
   decline_vc_profile_update_request : (principal, bool) -> (text);
@@ -449,6 +451,8 @@ service : () -> {
   get_role : () -> (RolesResponse) query;
   get_role_status : () -> (vec Role) query;
   get_roles_for_principal : (principal) -> (vec Role) query;
+  get_self_declined_requests_for_mentor : () -> (vec OfferToSendToMentor) query;
+  get_self_declined_requests_for_project : () -> (vec OfferToMentor) query;
   get_spotlight_projects : () -> (vec SpotlightDetails) query;
   get_suggestions_by_parent_id_caller : (text, nat64) -> (vec Suggestion) query;
   get_suggestions_by_status_caller : (text, text) -> (vec Suggestion) query;
@@ -499,7 +503,8 @@ service : () -> {
   register_venture_capitalist : (VentureCapitalist) -> (text);
   remove_project_from_spotlight : (text) -> (Result);
   reply_to_suggestion_caller : (nat64, text, text) -> (nat64, text);
-  send_offer_to_mentor : (principal, text, text) -> ();
+  self_decline_request : (text) -> (text);
+  send_offer_to_mentor : (principal, text, text) -> (text);
   send_request_as_mentor : (text, text) -> (text);
   switch_role : (text, text) -> ();
   update_founder_caller : (FounderInfo) -> (text);
