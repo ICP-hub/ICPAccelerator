@@ -60,10 +60,10 @@ pub struct ProjectInfo {
     pub project_description: String,
     pub project_cover: Vec<u8>,                                //project_cover
     pub project_team: Option<Vec<TeamMember>>,
-    pub token_economics: Option<String>,
-    pub technical_docs: Option<String>,
-    pub long_term_goals: Option<String>,
-    pub target_market: Option<String>,
+    pub token_economics: Option<String>,                       //private docs
+    pub technical_docs: Option<String>,                        //  ,,
+    pub long_term_goals: Option<String>,                       //  ,,   
+    pub target_market: Option<String>,                      
     pub self_rating_of_project: f64,
     pub user_data: UserInformation,
     pub mentors_assigned: Option<Vec<MentorProfile>>,
@@ -72,10 +72,10 @@ pub struct ProjectInfo {
     pub project_linkedin: Option<String>,
     pub project_website: Option<String>,
     pub project_discord: Option<String>,
-    pub icp_grants: Option<String>,
-    pub investors: Option<String>,
-    pub sns: Option<String>,
-    pub raised_from_other_ecosystem: Option<String>,
+    pub icp_grants: Option<String>,                            //private
+    pub investors: Option<String>,                             // ,,
+    pub sns: Option<String>,                                   // ,,
+    pub raised_from_other_ecosystem: Option<String>,           // ,,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, CandidType, PartialEq)]
@@ -317,6 +317,8 @@ pub async fn create_project(info: ProjectInfo) -> String {
     format!("{}", res)
 }
 
+//get_my_projects; all created projects
+#[query]
 pub fn get_projects_for_caller() -> Vec<ProjectInfo> {
     let caller = caller();
     APPLICATION_FORM.with(|storage| {
@@ -332,6 +334,7 @@ pub fn get_projects_for_caller() -> Vec<ProjectInfo> {
     })
 }
 
+//get_all_projects_with_project_id
 #[query]
 pub fn get_projects_with_all_info() -> Vec<ProjectInfoInternal> {
     let caller = caller();
@@ -345,12 +348,14 @@ pub fn get_projects_with_all_info() -> Vec<ProjectInfoInternal> {
     })
 }
 
+//get_first_or_one_project_id; for script //script execution stops upon consideration of multiple projects 
 #[query]
 pub fn get_project_id() -> String {
     let caller = caller();
     APPLICATION_FORM.with(|storage| {
         let projects = storage.borrow();
         let project_info = projects.get(&caller);
+        
         let projects = project_info
             .expect("couldn't get project information")
             .clone();
@@ -358,6 +363,8 @@ pub fn get_project_id() -> String {
         one.uid
     })
 }
+
+//get_project_by_id
 
 pub fn find_project_by_id(project_id: &str) -> Option<ProjectInfoInternal> {
     APPLICATION_FORM.with(|storage| {
