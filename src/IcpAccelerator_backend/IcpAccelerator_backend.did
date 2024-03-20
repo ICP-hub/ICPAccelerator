@@ -24,6 +24,13 @@ type Cohort = record {
   cohort_launch_date : text;
 };
 type CohortDetails = record { uid : text; created_at : nat64; cohort : Cohort };
+type Counts = record {
+  user_count : nat64;
+  only_user_count : nat64;
+  mentor_count : nat64;
+  vc_count : nat64;
+  project_count : nat64;
+};
 type Eligibility = record { level_on_rubric : float64; eligibility : opt text };
 type FilterCriteria = record {
   area_of_focus : opt text;
@@ -97,7 +104,10 @@ type MentorWithRoles = record {
   mentor_profile : MentorInternal;
   roles : vec Role;
 };
-type Notification = record { notification_type : NotificationType };
+type Notification = record {
+  notification_type : NotificationType;
+  timestamp : nat64;
+};
 type NotificationForOwner = record {
   sender_image : vec nat8;
   message : text;
@@ -398,6 +408,7 @@ service : () -> {
   get_accepted_request_for_project : () -> (vec OfferToMentor) query;
   get_admin_notifications : () -> (vec Notification) query;
   get_all_cohorts : () -> (vec CohortDetails) query;
+  get_all_jobs : () -> (vec Jobs) query;
   get_all_mentor_notification : (principal) -> (vec OfferToSendToMentor) query;
   get_all_mentors : () -> (vec record { principal; MentorWithRoles }) query;
   get_all_mentors_candid : () -> (
@@ -435,6 +446,7 @@ service : () -> {
   get_multichain_list : () -> (vec text) query;
   get_my_id : () -> (principal) query;
   get_notifications_for_hubs : () -> (vec NotificationProject) query;
+  get_pending_cycles : () -> (nat) query;
   get_pending_request_for_mentor : (principal) -> (
       vec OfferToSendToMentor,
     ) query;
@@ -456,6 +468,8 @@ service : () -> {
   get_spotlight_projects : () -> (vec SpotlightDetails) query;
   get_suggestions_by_parent_id_caller : (text, nat64) -> (vec Suggestion) query;
   get_suggestions_by_status_caller : (text, text) -> (vec Suggestion) query;
+  get_total_count : () -> (Counts) query;
+  get_total_pending_request : () -> (nat64) query;
   get_total_suggestions : (text) -> (nat64) query;
   get_user_info_struct : () -> (opt UserInformation) query;
   get_user_information : () -> (Result_1) query;

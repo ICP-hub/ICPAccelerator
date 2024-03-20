@@ -175,7 +175,7 @@ pub struct ProjectVecWithRoles {
 pub struct SpotlightDetails {
     pub added_by: Principal,
     pub project_id: String,
-    pub project_details: ProjectInfo, 
+    pub project_details: ProjectInfo,
 }
 
 pub type ProjectAnnouncements = HashMap<Principal, Vec<Announcements>>;
@@ -692,6 +692,18 @@ pub fn get_announcements() -> HashMap<Principal, Vec<Announcements>> {
     })
 }
 
+#[query]
+pub fn get_latest_announcements() -> HashMap<Principal, Vec<Announcements>> {
+    PROJECT_ANNOUNCEMENTS.with(|state| {
+        let state = state.borrow();
+        let mut sorted_state = state.clone();
+        for (_principal, announcements) in sorted_state.iter_mut() {
+            announcements.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+        }
+        sorted_state
+    })
+}
+
 #[update]
 pub fn add_BlogPost(url: String) -> String {
     let caller_id = caller();
@@ -1012,7 +1024,6 @@ pub fn post_job(
     })
 }
 
-
 pub fn get_jobs_for_project(project_id: String) -> Vec<Jobs> {
     let mut jobs_for_project = Vec::new();
 
@@ -1032,11 +1043,30 @@ pub fn get_jobs_for_project(project_id: String) -> Vec<Jobs> {
 }
 
 #[query]
-pub fn get_jobs_posted_by_project(project_id: String) -> Vec<Jobs>{
+pub fn get_all_jobs() -> Vec<Jobs> {
+    let mut all_jobs = Vec::new();
 
+    // Collect all jobs from the storage
+    POST_JOB.with(|jobs| {
+        let jobs = jobs.borrow();
+
+        for job_list in jobs.values() {
+            for job in job_list {
+                all_jobs.push(job.clone());
+            }
+        }
+    });
+
+    
+    all_jobs.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+    all_jobs
+}
+
+#[query]
+pub fn get_jobs_posted_by_project(project_id: String) -> Vec<Jobs> {
     POST_JOB.with(|jobs| {
         if let Some(job_list) = jobs.borrow().get(&caller()) {
-            
             let mut project_jobs: Vec<&Jobs> = job_list
                 .iter()
                 .filter(|job| job.project_id == project_id)
@@ -1045,7 +1075,7 @@ pub fn get_jobs_posted_by_project(project_id: String) -> Vec<Jobs>{
             project_jobs.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
 
             project_jobs.into_iter().take(6).cloned().collect()
-        }else{
+        } else {
             Vec::new()
         }
     })
